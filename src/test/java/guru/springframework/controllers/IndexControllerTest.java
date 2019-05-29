@@ -10,6 +10,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.Model;
+import reactor.core.publisher.Flux;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -53,28 +54,24 @@ public class IndexControllerTest {
     public void getIndexPage() throws Exception {
 
         //given
-        Set<Recipe> recipes = new HashSet<>();
-        recipes.add(new Recipe());
-
         Recipe recipe = new Recipe();
         recipe.setId("1");
 
-        recipes.add(recipe);
+        Flux<Recipe> recipes = Flux.just(new Recipe(), recipe);
 
         when(recipeService.getRecipes()).thenReturn(recipes);
 
-        ArgumentCaptor<Set<Recipe>> argumentCaptor = ArgumentCaptor.forClass(Set.class);
+        ArgumentCaptor<Flux<Recipe>> argumentCaptor = ArgumentCaptor.forClass(Flux.class);
 
         //when
         String viewName = controller.getIndexPage(model);
-
 
         //then
         assertEquals("index", viewName);
         verify(recipeService, times(1)).getRecipes();
         verify(model, times(1)).addAttribute(eq("recipes"), argumentCaptor.capture());
-        Set<Recipe> setInController = argumentCaptor.getValue();
-        assertEquals(2, setInController.size());
+        Flux<Recipe> setInController = argumentCaptor.getValue();
+        assertEquals(Long.valueOf(2), setInController.count().block());
     }
 
 }
