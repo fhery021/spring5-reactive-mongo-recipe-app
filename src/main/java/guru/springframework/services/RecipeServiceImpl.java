@@ -53,7 +53,6 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
-    @Transactional
     public Mono<RecipeCommand> findCommandById(String id) {
 
         RecipeCommand recipeCommand = recipeToRecipeCommand.convert(findById(id).block());
@@ -69,7 +68,6 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
-    @Transactional
     public Mono<RecipeCommand> saveRecipeCommand(RecipeCommand command) {
         Recipe detachedRecipe = recipeCommandToRecipe.convert(command);
 
